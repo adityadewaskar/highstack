@@ -2,10 +2,85 @@
 
 Better Ant Design primitives — Zod-powered forms, imperative modals & drawers with automatic z-index stacking.
 
+## The Problem
+
+With vanilla Ant Design, every modal and drawer needs boilerplate state management:
+
+```tsx
+// Vanilla antd — you manage open state, content, and options per modal
+const [isEditOpen, setIsEditOpen] = useState(false);
+const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+const [editUserId, setEditUserId] = useState<string | null>(null);
+
+<Modal open={isEditOpen} onCancel={() => setIsEditOpen(false)} title="Edit User" width={600}>
+  <EditUserForm userId={editUserId} onSave={() => setIsEditOpen(false)} />
+</Modal>
+
+<Modal open={isConfirmOpen} onCancel={() => setIsConfirmOpen(false)} title="Confirm">
+  <p>Are you sure?</p>
+</Modal>
+```
+
+Every modal/drawer adds more `useState`, more `<Modal>` JSX at the bottom of your component, more props threading. It gets worse with stacking — opening a confirmation modal from inside an edit drawer means managing z-index manually.
+
+## The Solution
+
+Build your components independently. Pass them into `openModal()` or `openDrawer()` when you need them. The component doesn't know or care that it's inside a modal — it's fully modular.
+
+```tsx
+// 1. Build your component — it's just a normal component
+function EditUserForm({ userId, onSave }: { userId: string; onSave: () => void }) {
+  return (
+    <Form onFinish={(values) => { save(values); onSave(); }}>
+      <Form.Item name="name"><Input /></Form.Item>
+      <Button htmlType="submit">Save</Button>
+    </Form>
+  );
+}
+
+// 2. Open it in a modal — pass it directly
+const { openModal, hideModal } = useModal();
+
+openModal(
+  <EditUserForm userId={id} onSave={() => hideModal()} />,
+  { title: 'Edit User', width: 600 }
+);
+
+// 3. Or open the same component in a drawer — zero changes to EditUserForm
+const { openDrawer, hideDrawer } = useDrawer();
+
+openDrawer(
+  <EditUserForm userId={id} onSave={() => hideDrawer()} />,
+  { title: 'Edit User', placement: 'right', width: 500 }
+);
+```
+
+The same component works in a modal, a drawer, or rendered inline — because it has no knowledge of its container. You decide the presentation at the call site.
+
+```tsx
+// Open from a button click
+<Button onClick={() => openModal(<AddMemberForm />, { title: 'Add Member' })}>
+  Add Member
+</Button>
+
+// Open from a table row action
+onRow: (record) => ({
+  onClick: () => openDrawer(<UserProfile userId={record.id} />, { width: 480 }),
+})
+
+// Stack them — z-index is automatic
+openModal(<ConfirmDialog />, { title: 'Are you sure?' });
+// Opens on top of whatever is already open, always
+```
+
+No `useState`. No `<Modal>` in your JSX. No z-index math. Just `openModal(component, options)` from anywhere.
+
+## Features
+
+- **No boilerplate** — pass components directly to `openModal()` / `openDrawer()` instead of managing `open` state
 - **Single Provider** — one `<HighstackAntDProvider>` replaces separate modal and drawer providers
-- **Imperative API** — `openModal(content, opts)` / `openDrawer(content, opts)` from anywhere
-- **Zod-first forms** — `useForm(form, schema)` generates Ant Design rules from Zod schemas
 - **Auto z-index** — modals and drawers stack correctly regardless of open order
+- **Zod-first forms** — `useForm(form, schema)` generates Ant Design rules from Zod schemas
 - **Zod v3 + v4** — works across both versions
 
 ## Installation
