@@ -1,6 +1,6 @@
 # @highstack/antd-utils
 
-Better Ant Design primitives — Zod-powered forms, imperative modals & drawers with automatic z-index stacking.
+Better Ant Design primitives — Zod-powered forms, imperative modals & drawers.
 
 ## The Problems
 
