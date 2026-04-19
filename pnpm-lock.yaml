@@ -8,6 +8,12 @@ importers:
 
   .:
     devDependencies:
+      typescript:
+        specifier: ^5.7.0
+        version: 5.9.3
+
+  packages/antd-utils:
+    devDependencies:
       '@types/react':
         specifier: ^19.0.0
         version: 19.2.14

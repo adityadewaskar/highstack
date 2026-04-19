@@ -8,24 +8,24 @@ import React, {
   useState,
 } from 'react';
 import { Modal, Drawer, Spin } from 'antd';
-import { BetterAntdContext } from './context';
+import { HighstackAntDContext } from './context';
 import type {
   ModalOptions,
   ModalStackItem,
   DrawerOptions,
   DrawerStackItem,
-  BetterAntdContextValue,
+  HighstackAntDContextValue,
 } from '../types';
 
 const BASE_Z_INDEX = 1000;
 
-interface BetterAntdProviderProps {
+interface HighstackAntDProviderProps {
   children: ReactNode;
   /** Base z-index for all modals/drawers. Each new one stacks +1 above. Default: 1000 */
   zIndex?: number;
 }
 
-export function BetterAntdProvider({ children, zIndex: baseZIndex = BASE_Z_INDEX }: BetterAntdProviderProps) {
+export function HighstackAntDProvider({ children, zIndex: baseZIndex = BASE_Z_INDEX }: HighstackAntDProviderProps) {
   const [modalStack, setModalStack] = useState<ModalStackItem[]>([]);
   const [drawerStack, setDrawerStack] = useState<DrawerStackItem[]>([]);
   const zIndexCounter = useRef(baseZIndex);
@@ -71,13 +71,13 @@ export function BetterAntdProvider({ children, zIndex: baseZIndex = BASE_Z_INDEX
 
   // --- Context ---
 
-  const value: BetterAntdContextValue = useMemo(
+  const value: HighstackAntDContextValue = useMemo(
     () => ({ openModal, hideModal, openDrawer, hideDrawer }),
     [openModal, hideModal, openDrawer, hideDrawer],
   );
 
   return (
-    <BetterAntdContext.Provider value={value}>
+    <HighstackAntDContext.Provider value={value}>
       {children}
 
       {/* Modals */}
@@ -123,6 +123,6 @@ export function BetterAntdProvider({ children, zIndex: baseZIndex = BASE_Z_INDEX
           </Drawer>
         );
       })}
-    </BetterAntdContext.Provider>
+    </HighstackAntDContext.Provider>
   );
 }

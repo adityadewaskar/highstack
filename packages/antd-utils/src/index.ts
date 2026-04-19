@@ -1,18 +1,18 @@
 // Provider
-export { BetterAntdProvider } from './Provider';
+export { HighstackAntDProvider } from './Provider';
 
 // Hooks
 export { useForm } from './Form';
 export { useModal } from './Modal';
 export { useDrawer } from './Drawer';
-export { useBetterAntd } from './useBetterAntd';
+export { useHighstackAntD } from './useHighstackAntD';
 
 // Standalone utils
 export { zodToAntdRules } from './Form';
 
 // Types
 export type {
-  BetterAntdContextValue,
+  HighstackAntDContextValue,
   ModalAPI,
   ModalOptions,
   DrawerAPI,

@@ -1,11 +1,11 @@
 import { useContext } from 'react';
-import { BetterAntdContext } from '../Provider/context';
+import { HighstackAntDContext } from '../Provider/context';
 import type { ModalAPI } from '../types';
 
 export function useModal(): ModalAPI {
-  const ctx = useContext(BetterAntdContext);
+  const ctx = useContext(HighstackAntDContext);
   if (!ctx) {
-    throw new Error('useModal must be used within <BetterAntdProvider>');
+    throw new Error('useModal must be used within <HighstackAntDProvider>');
   }
   return { openModal: ctx.openModal, hideModal: ctx.hideModal };
 }

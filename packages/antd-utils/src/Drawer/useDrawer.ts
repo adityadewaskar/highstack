@@ -1,11 +1,11 @@
 import { useContext } from 'react';
-import { BetterAntdContext } from '../Provider/context';
+import { HighstackAntDContext } from '../Provider/context';
 import type { DrawerAPI } from '../types';
 
 export function useDrawer(): DrawerAPI {
-  const ctx = useContext(BetterAntdContext);
+  const ctx = useContext(HighstackAntDContext);
   if (!ctx) {
-    throw new Error('useDrawer must be used within <BetterAntdProvider>');
+    throw new Error('useDrawer must be used within <HighstackAntDProvider>');
   }
   return { openDrawer: ctx.openDrawer, hideDrawer: ctx.hideDrawer };
 }

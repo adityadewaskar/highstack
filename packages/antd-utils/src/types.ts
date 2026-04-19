@@ -47,4 +47,4 @@ export interface DrawerAPI {
 
 // --- Context ---
 
-export interface BetterAntdContextValue extends ModalAPI, DrawerAPI {}
+export interface HighstackAntDContextValue extends ModalAPI, DrawerAPI {}
