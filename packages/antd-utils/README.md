@@ -2,7 +2,9 @@
 
 Better Ant Design primitives — Zod-powered forms, imperative modals & drawers with automatic z-index stacking.
 
-## The Problem
+## The Problems
+
+### Modals & Drawers — state management hell
 
 With vanilla Ant Design, every modal and drawer needs boilerplate state management:
 
@@ -23,7 +25,66 @@ const [editUserId, setEditUserId] = useState<string | null>(null);
 
 Every modal/drawer adds more `useState`, more `<Modal>` JSX at the bottom of your component, more props threading. It gets worse with stacking — opening a confirmation modal from inside an edit drawer means managing z-index manually.
 
-## The Solution
+### Forms — duplicate validation logic
+
+With vanilla Ant Design forms, you write validation rules by hand for every field — then repeat the same rules in your backend Zod schema. Two sources of truth that inevitably drift apart:
+
+```tsx
+// Vanilla antd — manual rules per field, duplicated from your Zod schema
+<Form.Item
+  name="email"
+  rules={[
+    { required: true, message: 'Email is required' },
+    { type: 'email', message: 'Invalid email' },
+    { max: 255, message: 'Too long' },
+  ]}
+>
+  <Input />
+</Form.Item>
+
+<Form.Item
+  name="password"
+  rules={[
+    { required: true, message: 'Password is required' },
+    { min: 8, message: 'Min 8 characters' },
+    // Did you remember the uppercase check? The special char check?
+    // Is this in sync with your Zod schema? Who knows.
+  ]}
+>
+  <Input.Password />
+</Form.Item>
+```
+
+With `useForm`, your Zod schema **is** the validation. One schema drives both frontend and backend — zero duplication:
+
+```tsx
+// Define once — in your shared schemas
+const loginSchema = z.object({
+  email: z.string().email('Invalid email').max(255),
+  password: z.string().min(8).refine(p => /[A-Z]/.test(p), { message: 'Need uppercase' }),
+});
+
+// Use everywhere — Zod drives antd validation automatically
+const [form] = Form.useForm();
+const { rules, handleSubmit } = useForm(form, loginSchema);
+
+<Form form={form} onFinish={handleSubmit(onLogin)}>
+  <Form.Item name="email" rules={rules.email}>       {/* ← rules from Zod */}
+    <Input />
+  </Form.Item>
+  <Form.Item name="password" rules={rules.password}>  {/* ← rules from Zod */}
+    <Input.Password />
+  </Form.Item>
+</Form>
+```
+
+Add a `.min()`, `.regex()`, or `.refine()` to your Zod schema — the frontend form rules update automatically. No manual syncing. No forgotten edge cases.
+
+---
+
+## The Solutions
+
+### Modals & Drawers — modular, imperative
 
 Build your components independently. Pass them into `openModal()` or `openDrawer()` when you need them. The component doesn't know or care that it's inside a modal — it's fully modular.
 
@@ -77,10 +138,10 @@ No `useState`. No `<Modal>` in your JSX. No z-index math. Just `openModal(compon
 
 ## Features
 
-- **No boilerplate** — pass components directly to `openModal()` / `openDrawer()` instead of managing `open` state
+- **Zod-driven forms** — one Zod schema drives both frontend Ant Design rules and backend validation. No manual rules, no duplication, no drift
+- **Modular modals & drawers** — pass any component into `openModal()` / `openDrawer()`. The component is decoupled from its container
 - **Single Provider** — one `<HighstackAntDProvider>` replaces separate modal and drawer providers
 - **Auto z-index** — modals and drawers stack correctly regardless of open order
-- **Zod-first forms** — `useForm(form, schema)` generates Ant Design rules from Zod schemas
 - **Zod v3 + v4** — works across both versions
 
 ## Installation
